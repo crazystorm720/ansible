@@ -1,0 +1,12 @@
+[debian]
+desktop0 ansible_host=192.168.2.82 ansible_user=medusa
+aphrodite ansible_host=192.168.1.219 ansible_user=medusa
+dtool0 ansible_host=192.168.1.12 ansible_user=medusa
+remote0 ansible_host=192.168.1.126 ansible_user=medusa
+vault0 ansible_host=192.168.1.120 ansible_user=medusa
+
+[ubuntu]
+node0 ansible_host=192.168.1.114 ansible_user=medusa
+node1 ansible_host=192.168.1.227 ansible_user=medusa
+utool0 ansible_host=192.168.1.212 ansible_user=medusa
+utool0-localhost ansible_host=localhost ansible_user=medusa

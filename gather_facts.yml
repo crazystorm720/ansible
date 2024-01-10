@@ -1,0 +1,20 @@
+---
+- name: Gather system facts and save on control node
+  hosts: all
+  tasks:
+    - name: Collect system facts
+      ansible.builtin.setup:
+
+    - name: Ensure local facts directory exists
+      ansible.builtin.file:
+        path: "/home/medusa/ansible/facts"
+        state: directory
+        mode: '0755'
+      delegate_to: localhost
+      run_once: true
+
+    - name: Write facts to local file
+      ansible.builtin.copy:
+        content: "{{ ansible_facts }}"
+        dest: "/home/medusa/ansible/facts/{{ inventory_hostname }}_facts.json"
+      delegate_to: localhost

@@ -1,0 +1,14 @@
+- name: Update and Upgrade Apt Packages
+  hosts: all
+  pre_tasks:
+    - name: Include secret variables
+      include_vars:
+        file: secret.yml
+  tasks:
+    - name: Update apt repo
+      ansible.builtin.apt:
+        update_cache: yes
+        cache_valid_time: 3600
+    - name: Upgrade all packages to the latest version
+      ansible.builtin.apt:
+        upgrade: dist
