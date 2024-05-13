@@ -2,14 +2,9 @@
   become: true
 
   tasks:
-    - name: Ensure APT lock is absent
-      file:
-        path: /var/lib/apt/lists/lock
-        state: absent
-      become: true
-
     - name: Update and Upgrade APT Packages
       apt:
         upgrade: yes
         update_cache: yes
+        become: true
       ignore_errors: yes  # Optionally, to not fail the playbook on errors
