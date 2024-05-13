@@ -1,10 +1,25 @@
+---
 - hosts: all
-  become: true
-
+  become: true  # Ensure we have elevated privileges for package management
   tasks:
-    - name: Update and Upgrade APT Packages
+    - name: Gathering Facts
+      setup:  # This is the default module for gathering system facts, explicitly calling it for clarity
+
+    - name: Update APT package cache
       apt:
-        upgrade: yes
-        update_cache: yes
-        become: true
-      ignore_errors: yes  # Optionally, to not fail the playbook on errors
+        update_cache: yes  # This updates the package list
+
+    - name: Upgrade all APT packages
+      apt:
+        upgrade: 'dist'  # Use 'dist' for distribution upgrades, which is generally safer than 'full'
+        autoremove: yes  # Automatically remove packages that are no longer needed
+        allow_change_held_packages: yes  # Allow changing packages that are held back, handle with caution
+
+    - name: Clean up APT cache
+      apt:
+        autoclean: yes  # Removes .deb files for packages that are no longer installed on the system
+
+    - name: Remove unnecessary packages
+      apt:
+        autoremove: yes  # Redundant here but ensures any leftovers from previous steps are cleaned up
+        purge: yes  # Use purge to remove configs and other leftover files
