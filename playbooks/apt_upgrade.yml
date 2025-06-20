@@ -1,5 +1,6 @@
 - name: Update and Upgrade Apt Packages
   hosts: all
+  become: yes
   tasks:
     - name: Update apt repo
       ansible.builtin.apt:
