@@ -1,10 +1,35 @@
 ---
 - name: Apply base configuration
   hosts: all
+  # Load variables in explicit precedence order
   vars_files:
-    - "{{ playbook_dir }}/../environments/{{ env | default('prod') }}.yml"
-    - "{{ playbook_dir }}/../group_vars/all.yml"  # Load global vars
+    - "{{ playbook_dir }}/../group_vars/all.yml"               # Baseline defaults
+    - "{{ playbook_dir }}/../environments/{{ env | default('prod') }}.yml"  # Environment overrides
+  
+  # Explicit settings for reliability
+  gather_facts: true                                           # Required for ansible_os_family
+  any_errors_fatal: true                                       # Fail fast on critical base setup
+
+  pre_tasks:
+    - name: Validate Python interpreter
+      assert:
+        that:
+          - ansible_python_interpreter is defined
+          - ansible_python_interpreter != ''
+        fail_msg: "Python interpreter not properly configured in group_vars"
+        quiet: yes
+      tags: always
 
   roles:
     - role: common
-      tags: always
+      tags: [common, always]
+  
+  post_tasks:
+    - name: Verify base connectivity
+      ansible.builtin.ping:
+      changed_when: false
+      tags: [validation, always]
+
+  tags:
+    - base
+    - always
