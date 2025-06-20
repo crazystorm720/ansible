@@ -1,9 +1,9 @@
 ---
 - name: Gather and store system facts
   hosts: all
-  become: false  # Facts gathering doesn't need sudo
+  become: false  # No sudo needed for facts gathering
   vars:
-    facts_dir: "/tmp/semaphore/facts"  # Semaphore-friendly location
+    facts_dir: "/tmp/semaphore/facts"
     facts_file: "{{ facts_dir }}/{{ inventory_hostname }}_facts.json"
 
   tasks:
@@ -11,12 +11,13 @@
       ansible.builtin.setup:
       register: gathered_facts
 
-    - name: Ensure local facts directory exists
+    - name: Ensure local facts directory exists (no sudo)
       ansible.builtin.file:
         path: "{{ facts_dir }}"
         state: directory
         mode: '0755'
       delegate_to: localhost
+      become: false  # Explicitly disable sudo
       run_once: true
 
     - name: Save facts to JSON file
@@ -24,6 +25,7 @@
         content: "{{ gathered_facts.ansible_facts | to_nice_json }}"
         dest: "{{ facts_file }}"
       delegate_to: localhost
+      become: false  # Explicitly disable sudo
       when: gathered_facts is changed
 
     - name: Display facts file location
