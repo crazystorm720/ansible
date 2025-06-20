@@ -10,6 +10,11 @@
   gather_facts: true                                           # Required for ansible_os_family
   any_errors_fatal: true                                       # Fail fast on critical base setup
 
+  vars:
+    # Safe defaults with Semaphore compatibility
+    ansible_python_interpreter: "{{ ansible_python_interpreter | default('auto_silent') }}"
+    ansible_ssh_private_key_file: "{{ lookup('env', 'SSH_KEY_PATH') | default(ansible_ssh_private_key_file, true) }}"
+
   pre_tasks:
     - name: Validate Python interpreter
       assert:
@@ -18,6 +23,14 @@
           - ansible_python_interpreter != ''
         fail_msg: "Python interpreter not properly configured in group_vars"
         quiet: yes
+      tags: always
+
+    - name: Verify SSH connection parameters
+      assert:
+        that:
+          - ansible_user is defined
+          - ansible_ssh_private_key_file is defined or ansible_password is defined
+        fail_msg: "Missing required connection parameters in Semaphore variables"
       tags: always
 
   roles:
@@ -33,7 +46,3 @@
   tags:
     - base
     - always
-
- vars:
-  # Ensure Python interpreter is available
-  ansible_python_interpreter: "{{ ansible_python_interpreter | default('auto_silent') }}"   
