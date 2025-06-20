@@ -1,0 +1,10 @@
+---
+# Debian/Ubuntu specific
+common_packages_debian:
+  - aptitude
+  - debconf-utils
+
+# RedHat specific  
+common_packages_redhat:
+  - yum-utils
+  - epel-release

@@ -1,6 +1,19 @@
 ---
-- name: Install common packages
-  apt:
-    name: "{{ common_packages }}"
+- name: Set OS-specific package list
+  set_fact:
+    os_specific_packages: "{{ 
+      'common_packages_' + ansible_os_family | lower 
+    }}"
+  
+- name: Combine all packages
+  set_fact:
+    final_package_list: "{{
+      common_packages + 
+      (vars[os_specific_packages] | default([]))
+    }}"
+
+- name: Install combined packages
+  package:
+    name: "{{ final_package_list }}"
     state: present
-  when: ansible_os_family == 'Debian'
+  when: final_package_list | length > 0

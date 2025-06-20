@@ -1,0 +1,10 @@
+---
+common_packages:
+  - apt-transport-https
+  - ca-certificates
+  - curl
+  - wget
+  - vim
+  - git
+  - htop
+  - jq

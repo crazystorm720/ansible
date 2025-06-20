@@ -1,0 +1,4 @@
+---
+# Optional VM-specific overrides
+common_packages_extra:
+  - cloud-init

@@ -1,16 +1,10 @@
 ---
-- name: Apply base configuration to all systems
+- name: Apply base configuration
   hosts: all
   vars_files:
     - "{{ playbook_dir }}/../environments/{{ env | default('prod') }}.yml"
-  
-  # Critical path configuration for Semaphore
-  vars:
-    ansible_roles_path: "{{ playbook_dir }}/../../roles"
-  
+    - "{{ playbook_dir }}/../group_vars/all.yml"  # Load global vars
+
   roles:
     - role: common
       tags: always
-  tags:
-    - base
-    - always

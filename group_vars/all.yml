@@ -1,0 +1,3 @@
+---
+# Global overrides (highest priority)
+common_packages_extra: []  # Add site-specific packages here
