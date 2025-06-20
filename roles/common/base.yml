@@ -1,4 +1,5 @@
 ---
+# roles/common/base.yml
 - name: Apply base configuration to all systems
   hosts: all
   vars_files:
