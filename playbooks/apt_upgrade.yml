@@ -1,9 +1,5 @@
 - name: Update and Upgrade Apt Packages
   hosts: all
-  pre_tasks:
-    - name: Include secret variables
-      include_vars:
-        file: secret.yml
   tasks:
     - name: Update apt repo
       ansible.builtin.apt:
