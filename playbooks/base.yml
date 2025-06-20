@@ -1,48 +1,29 @@
 ---
-- name: Apply base configuration
+- name: Apply base configuration to all systems
   hosts: all
-  # Load variables in explicit precedence order
   vars_files:
-    - "{{ playbook_dir }}/../group_vars/all.yml"               # Baseline defaults
-    - "{{ playbook_dir }}/../environments/{{ env | default('prod') }}.yml"  # Environment overrides
-  
-  # Explicit settings for reliability
-  gather_facts: true                                           # Required for ansible_os_family
-  any_errors_fatal: true                                       # Fail fast on critical base setup
+    - "{{ playbook_dir }}/../group_vars/all.yml"
+    - "{{ playbook_dir }}/../environments/{{ env | default('prod') }}.yml"
 
   vars:
-    # Safe defaults with Semaphore compatibility
     ansible_python_interpreter: "{{ ansible_python_interpreter | default('auto_silent') }}"
     ansible_ssh_private_key_file: "{{ lookup('env', 'SSH_KEY_PATH') | default(ansible_ssh_private_key_file, true) }}"
 
   pre_tasks:
-    - name: Validate Python interpreter
-      assert:
-        that:
-          - ansible_python_interpreter is defined
-          - ansible_python_interpreter != ''
-        fail_msg: "Python interpreter not properly configured in group_vars"
-        quiet: yes
-      tags: always
-
-    - name: Verify SSH connection parameters
+    - name: Validate connection parameters
       assert:
         that:
           - ansible_user is defined
           - ansible_ssh_private_key_file is defined or ansible_password is defined
-        fail_msg: "Missing required connection parameters in Semaphore variables"
+        fail_msg: "Missing required connection parameters"
       tags: always
 
   roles:
     - role: common
-      tags: [common, always]
-  
+      tags: [base, common, always]
+
   post_tasks:
     - name: Verify base connectivity
       ansible.builtin.ping:
       changed_when: false
       tags: [validation, always]
-
-  tags:
-    - base
-    - always
