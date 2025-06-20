@@ -1,0 +1,67 @@
+---
+- name: Install essential system packages
+  hosts: all
+  become: true
+  vars:
+    essential_packages:
+      - qemu-guest-agent
+      - vim
+      - git
+      - tmux
+      - htop
+      - curl
+      - wget
+      - net-tools
+      - aptitude
+      - rsync
+      - unzip
+    update_cache: yes
+    upgrade_packages: no
+
+  tasks:
+    - name: Update apt package cache
+      ansible.builtin.apt:
+        update_cache: "{{ update_cache }}
+      changed_when: false  # Don't report changes for cache updates
+
+    - name: Install essential packages
+      ansible.builtin.apt:
+        name: "{{ essential_packages }}"
+        state: present
+        upgrade: "{{ upgrade_packages }}"
+      register: package_install
+      retries: 3
+      delay: 10
+      until: package_install is succeeded
+      notify:
+        - Enable qemu-guest-agent
+        - Restart qemu-guest-agent
+
+    - name: Ensure qemu-guest-agent is running (immediate check)
+      ansible.builtin.service:
+        name: qemu-guest-agent
+        state: started
+        enabled: yes
+      when: "'qemu-guest-agent' in essential_packages"
+
+  handlers:
+    - name: Enable qemu-guest-agent
+      ansible.builtin.systemd:
+        name: qemu-guest-agent
+        enabled: yes
+      when: "'qemu-guest-agent' in essential_packages"
+
+    - name: Restart qemu-guest-agent
+      ansible.builtin.service:
+        name: qemu-guest-agent
+        state: restarted
+      when: "'qemu-guest-agent' in essential_packages"
+
+    - name: Reboot if required (notify only)
+      ansible.builtin.reboot:
+        msg: "Reboot initiated by Ansible for kernel updates"
+        connect_timeout: 5
+        reboot_timeout: 600
+        pre_reboot_delay: 0
+        post_reboot_delay: 30
+      when: package_install.reboot_required
