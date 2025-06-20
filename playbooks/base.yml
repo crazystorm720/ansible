@@ -1,0 +1,11 @@
+---
+- name: Apply base configuration to all systems
+  hosts: all
+  vars_files:
+    - "../environments/{{ env | default('prod') }}.yml"
+  roles:
+    - role: common
+      tags: always
+  tags:
+    - base
+    - always

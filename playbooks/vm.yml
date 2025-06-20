@@ -1,0 +1,16 @@
+---
+- name: Configure virtual machine specifics
+  hosts: vms
+  vars_files:
+    - "../environments/{{ env | default('prod') }}.yml"
+  pre_tasks:
+    - name: Verify virtualization
+      assert:
+        that: ansible_virtualization_type != 'physical'
+        fail_msg: "Target is not a virtual machine!"
+  roles:
+    - role: qemu-guest
+      tags: qemu
+  tags:
+    - vm
+    - virtualization

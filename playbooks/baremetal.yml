@@ -1,0 +1,16 @@
+---
+- name: Configure physical hardware specifics
+  hosts: physical
+  vars_files:
+    - "../environments/{{ env | default('prod') }}.yml"
+  pre_tasks:
+    - name: Verify physical system
+      assert:
+        that: ansible_virtualization_type == 'physical'
+        fail_msg: "Target is not bare metal hardware!"
+  roles:
+    - role: physical-tools
+      tags: hardware
+  tags:
+    - baremetal
+    - physical
