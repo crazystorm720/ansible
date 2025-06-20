@@ -2,15 +2,60 @@
 - name: Configure virtual machine specifics
   hosts: vms
   vars_files:
-    - "../environments/{{ env | default('prod') }}.yml"
+    - "{{ playbook_dir }}/../environments/{{ env | default('prod') }}.yml"
+    - "{{ playbook_dir }}/../group_vars/vms.yml"
+
+  # Semaphore-optimized settings
+  gather_facts: true
+  any_errors_fatal: true
+  vars:
+    # Semaphore-compatible key injection
+    ansible_ssh_private_key_file: "{{ lookup('env', 'SEMAPHORE_SSH_KEY_PATH') | default(ansible_ssh_private_key_file, true) }}"
+
   pre_tasks:
-    - name: Verify virtualization
+    - name: Validate Semaphore connection parameters
       assert:
-        that: ansible_virtualization_type != 'physical'
-        fail_msg: "Target is not a virtual machine!"
+        that:
+          - ansible_user is defined
+          - ansible_ssh_private_key_file is defined
+          - ansible_ssh_private_key_file | length > 0
+        fail_msg: >-
+          Missing Semaphore connection parameters!
+          Required: ansible_user and SSH key.
+          Check template environment variables.
+      tags: always
+
+    - name: Verify virtualization environment
+      assert:
+        that:
+          - ansible_virtualization_type is defined
+          - ansible_virtualization_type != 'physical'
+          - ansible_virtualization_type != 'none'
+        fail_msg: >-
+          Virtualization check failed (type={{ ansible_virtualization_type | default('undefined') }}).
+          Host must be a KVM/QEMU virtual machine.
+        quiet: yes
+      tags: always
+
   roles:
     - role: qemu-guest
-      tags: qemu
+      tags: [qemu, vm-essential]
+
+  post_tasks:
+    - name: Verify QEMU agent connectivity
+      ansible.builtin.command: >
+        virsh -c qemu:///system qemu-agent-command
+        "{{ ansible_host }}" '{"execute":"guest-ping"}'
+      changed_when: false
+      ignore_errors: yes
+      register: agent_check
+      tags: [validation, qemu]
+
+    - name: Log agent status
+      debug:
+        msg: "QEMU agent {{ 'active' if agent_check is success else 'inactive' }}"
+      tags: [validation, qemu]
+
   tags:
     - vm
     - virtualization
