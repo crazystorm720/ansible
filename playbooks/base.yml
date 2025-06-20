@@ -33,3 +33,7 @@
   tags:
     - base
     - always
+
+ vars:
+  # Ensure Python interpreter is available
+  ansible_python_interpreter: "{{ ansible_python_interpreter | default('auto_silent') }}"   
