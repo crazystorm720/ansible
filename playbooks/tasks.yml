@@ -21,7 +21,7 @@
   tasks:
     - name: Update apt package cache
       ansible.builtin.apt:
-        update_cache: "{{ update_cache }}
+        update_cache: "{{ update_cache }}"
       changed_when: false  # Don't report changes for cache updates
 
     - name: Install essential packages
