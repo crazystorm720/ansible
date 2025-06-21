@@ -1,9 +1,8 @@
 ---
-# THE SINGLE PACKAGE LIST - YOUR SOURCE OF TRUTH
+# SINGLE SOURCE OF TRUTH - Edit this list only
 common_packages:
-  - vim        # Keep
-  - curl       # Keep
-  - git        # Keep
-  # - htop     # Removed = will be uninstalled if present
-  # - nano     # Removed = will be uninstalled if present
-  # - telnet   # Removed = will be uninstalled if present
+  - vim
+  - curl
+  - git
+  # - htop     # Comment/uncomment to remove/add
+  # - nano     # These will be uninstalled when commented out

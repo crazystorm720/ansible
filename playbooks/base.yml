@@ -1,32 +1,13 @@
 ---
-- name: Apply base configuration to all systems
+- name: Apply base configuration
   hosts: all
   become: yes
   vars:
-    # Define environment first to avoid recursion
-    env: "{{ lookup('env', 'ANSIBLE_ENV') | default('prod', true) }}"
-    ansible_python_interpreter: "{{ ansible_python_interpreter | default('auto_silent') }}"
-    ansible_ssh_private_key_file: "{{ lookup('env', 'SSH_KEY_PATH') | default(ansible_ssh_private_key_file, true) }}"
-
+    env: "{{ semaphore_environment | default('prod') }}"  # Semaphore will pass this
+    
   vars_files:
-    - "{{ playbook_dir }}/../group_vars/all.yml"
-    - "{{ playbook_dir }}/../environments/{{ env }}.yml"
-
-  pre_tasks:
-    - name: Validate connection parameters
-      assert:
-        that:
-          - ansible_user is defined
-          - ansible_ssh_private_key_file is defined or ansible_password is defined
-        fail_msg: "Missing required connection parameters"
-      tags: always
-
+    - "{{ playbook_dir }}/../environments/{{ env }}.yml"  # Environment overrides
+    
   roles:
     - role: common
-      tags: [base, common, always, packages]
-
-  post_tasks:
-    - name: Verify base connectivity
-      ansible.builtin.ping:
-      changed_when: false
-      tags: [validation, always]
+      tags: [base, packages]

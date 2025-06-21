@@ -4,4 +4,6 @@
     name: "{{ common_packages }}"
     state: present
     update_cache: yes
-  tags: packages
+    autoremove: yes  # Automatically removes orphaned dependencies
+    purge: yes       # Completely removes config files when uninstalling
+  tags: [packages]
