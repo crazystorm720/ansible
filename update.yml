@@ -1,9 +1,0 @@
----
-- hosts: all
-  become: true
-  become_method: sudo
-  tasks:
-    - name: APT Package Updater
-      apt:
-        update_cache: yes
-        upgrade: dist

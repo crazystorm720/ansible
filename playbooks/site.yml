@@ -1,4 +1,0 @@
----
-- import_playbook: base.yml
-- import_playbook: vm.yml
-- import_playbook: physical.yml

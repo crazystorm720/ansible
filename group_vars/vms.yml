@@ -1,8 +1,0 @@
----
-# Common VM settings across environments
-ansible_ssh_common_args: >-
-  -o StrictHostKeyChecking=accept-new
-  -o ConnectTimeout=15
-
-# QEMU specific settings
-qemu_agent_service: qemu-guest-agent

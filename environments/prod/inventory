@@ -1,5 +1,0 @@
-[vm]
-tool0 ansible_host=192.168.86.8
-
-[all:vars]
-ansible_user=medusa
