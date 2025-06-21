@@ -1,19 +1,7 @@
 ---
-- name: Set OS-specific package list
-  set_fact:
-    os_specific_packages: "{{ 
-      'common_packages_' + ansible_os_family | lower 
-    }}"
-  
-- name: Combine all packages
-  set_fact:
-    final_package_list: "{{
-      common_packages + 
-      (vars[os_specific_packages] | default([]))
-    }}"
-
-- name: Install combined packages
-  package:
-    name: "{{ final_package_list }}"
+- name: Ensure exact package set is installed
+  ansible.builtin.apt:
+    name: "{{ common_packages }}"
     state: present
-  when: final_package_list | length > 0
+    update_cache: yes
+  tags: packages

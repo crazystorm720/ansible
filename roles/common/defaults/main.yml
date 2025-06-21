@@ -1,10 +1,9 @@
 ---
+# THE SINGLE PACKAGE LIST - YOUR SOURCE OF TRUTH
 common_packages:
-  - apt-transport-https
-  - ca-certificates
-  - curl
-  - wget
-  - vim
-  - git
-  - jq
-  - nano
+  - vim        # Keep
+  - curl       # Keep
+  - git        # Keep
+  # - htop     # Removed = will be uninstalled if present
+  # - nano     # Removed = will be uninstalled if present
+  # - telnet   # Removed = will be uninstalled if present
