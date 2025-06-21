@@ -1,15 +1,16 @@
 ---
 - name: Apply base configuration to all systems
   hosts: all
-  become: yes  # Ensures root privileges for package management
-  vars_files:
-    - "{{ playbook_dir }}/../group_vars/all.yml"
-    - "{{ playbook_dir }}/../environments/{{ env | default('prod') }}.yml"
-
+  become: yes
   vars:
-    env: "{{ env | default('prod') }}"  # Explicit environment variable
+    # Define environment first to avoid recursion
+    env: "{{ lookup('env', 'ANSIBLE_ENV') | default('prod', true) }}"
     ansible_python_interpreter: "{{ ansible_python_interpreter | default('auto_silent') }}"
     ansible_ssh_private_key_file: "{{ lookup('env', 'SSH_KEY_PATH') | default(ansible_ssh_private_key_file, true) }}"
+
+  vars_files:
+    - "{{ playbook_dir }}/../group_vars/all.yml"
+    - "{{ playbook_dir }}/../environments/{{ env }}.yml"
 
   pre_tasks:
     - name: Validate connection parameters
@@ -22,7 +23,7 @@
 
   roles:
     - role: common
-      tags: [base, common, always, packages]  # Added 'packages' tag for targeted runs
+      tags: [base, common, always, packages]
 
   post_tasks:
     - name: Verify base connectivity
