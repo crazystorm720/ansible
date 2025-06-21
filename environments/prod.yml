@@ -1,4 +1,0 @@
----
-# Production-specific VM settings
-qemu_agent_package: qemu-guest-agent
-vm_tools_extra_packages: []
