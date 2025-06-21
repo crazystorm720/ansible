@@ -6,6 +6,5 @@ common_packages:
   - wget
   - vim
   - git
-  - htop
   - jq
   - nano
